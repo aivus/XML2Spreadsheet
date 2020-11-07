@@ -15,6 +15,8 @@
         }
     },
     "require": {
-        "symfony/console": "^5.1"
+        "symfony/console": "^5.1",
+        "php-di/php-di": "^6.3",
+        "guzzlehttp/guzzle": "^7.0"
     }
 }

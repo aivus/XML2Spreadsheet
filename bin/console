@@ -6,7 +6,13 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 use aivus\XML2Spreadsheet\Command\ConvertXMLToSpreadsheetCommand;
 use Symfony\Component\Console\Application;
 
+$containerBuilder = new DI\ContainerBuilder();
+$containerBuilder->addDefinitions('config/di.php');
+$container = $containerBuilder->build();
+
+$command = $container->get(ConvertXMLToSpreadsheetCommand::class);
+
 $application = new Application();
-$application->add(new ConvertXMLToSpreadsheetCommand());
+$application->add($command);
 
 $application->run();
