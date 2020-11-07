@@ -1,14 +1,14 @@
 <?php
 
-namespace aivus\SpreadsheetConverter\Command;
+namespace aivus\XML2Spreadsheet\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConvertCommand extends Command
+class ConvertXMLToSpreadsheetCommand extends Command
 {
-    protected static $defaultName = 'app:convert';
+    protected static $defaultName = 'app:convert-xml-to-spreadsheet';
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -18,7 +18,8 @@ class ConvertCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Convert a file to Google Spreadsheet document')
+            ->setDescription('Convert XML file to ф Google Spreadsheet document')
             ->addArgument('');
     }
+
 }

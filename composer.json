@@ -11,7 +11,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "aivus\\SpreadsheetConverter\\": "src/"
+            "aivus\\XML2Spreadsheet\\": "src/"
         }
     },
     "require": {

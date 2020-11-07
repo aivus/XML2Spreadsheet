@@ -3,10 +3,10 @@
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-use aivus\SpreadsheetConverter\Command\ConvertCommand;
+use aivus\XML2Spreadsheet\Command\ConvertXMLToSpreadsheetCommand;
 use Symfony\Component\Console\Application;
 
 $application = new Application();
-$application->add(new ConvertCommand());
+$application->add(new ConvertXMLToSpreadsheetCommand());
 
 $application->run();
