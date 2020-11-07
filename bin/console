@@ -1,0 +1,12 @@
+#!/usr/bin/env php
+<?php
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+use aivus\SpreadsheetConverter\Command\ConvertCommand;
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+$application->add(new ConvertCommand());
+
+$application->run();

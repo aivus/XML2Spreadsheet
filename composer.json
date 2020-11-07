@@ -1,0 +1,20 @@
+{
+    "name": "aivus/spreadsheet-converter",
+    "description": "This application provides a way to convert a file to Google Spreadsheet document",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ilya Antipenko",
+            "email": "ilya@antipenko.pp.ua"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "aivus\\SpreadsheetConverter\\": "src/"
+        }
+    },
+    "require": {
+        "symfony/console": "^5.1"
+    }
+}
