@@ -2,9 +2,15 @@
 
 namespace aivus\XML2Spreadsheet\Downloader;
 
+use aivus\XML2Spreadsheet\Context;
+
+/**
+ * Downloader for local files
+ * It supports files:// protocol and local path
+ */
 class LocalDownloader implements DownloaderInterface
 {
-    public function getFileByURI(string $uri, array $context = [])
+    public function getFileByURI(string $uri, Context $context)
     {
         if (!is_readable($uri)) {
             return false;

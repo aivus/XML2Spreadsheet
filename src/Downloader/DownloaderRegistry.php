@@ -2,6 +2,9 @@
 
 namespace aivus\XML2Spreadsheet\Downloader;
 
+/**
+ * Registry of all known dowloaders
+ */
 class DownloaderRegistry
 {
     /** @var DownloaderInterface[] */

@@ -18,6 +18,7 @@
         "symfony/console": "^5.1",
         "php-di/php-di": "^6.3",
         "guzzlehttp/guzzle": "^7.0",
-        "nicolab/php-ftp-client": "^1.5"
+        "nicolab/php-ftp-client": "^1.5",
+        "google/apiclient": "^2.0"
     }
 }

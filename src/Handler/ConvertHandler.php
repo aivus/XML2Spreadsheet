@@ -2,40 +2,62 @@
 
 namespace aivus\XML2Spreadsheet\Handler;
 
-use aivus\XML2Spreadsheet\Converter\ProductsupXMLConverter;
+use aivus\XML2Spreadsheet\Context;
+use aivus\XML2Spreadsheet\Converter\ConverterFactory;
 use aivus\XML2Spreadsheet\Downloader\DownloaderInterface;
 use aivus\XML2Spreadsheet\Downloader\DownloaderRegistry;
 use aivus\XML2Spreadsheet\Exception\DownloadSourceFileException;
+use aivus\XML2Spreadsheet\Exception\ParserNotFound;
 use aivus\XML2Spreadsheet\Exception\SupportedDownloaderNotFound;
+use aivus\XML2Spreadsheet\Parser\ParserInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
+/**
+ * Facade for all convertion logic
+ */
 class ConvertHandler
 {
-    private ProductsupXMLConverter $converter;
+    private ConverterFactory $converterFactory;
     private DownloaderRegistry $downloaderRegistry;
+    private ContainerInterface $container;
 
-    public function convert(string $uri, array $context)
+    public function __construct(
+        ConverterFactory $converterFactory,
+        DownloaderRegistry $downloaderRegistry,
+        ContainerInterface $container
+    ) {
+        $this->converterFactory = $converterFactory;
+        $this->downloaderRegistry = $downloaderRegistry;
+        $this->container = $container;
+    }
+
+    public function convert(string $uri, Context $context)
     {
         $file = $this->downloadFile($uri, $context);
+
+        $parser = $this->getParser($context);
+        $converter = $this->converterFactory->create();
+        $converter->setParser($parser);
+
         try {
-            $this->converter->convert($file);
+            $spreadsheetInfo = $converter->convert($file, $context);
+        } catch (\Exception $e) {
+            // TODO: Add logging
+            throw $e;
         } finally {
             if (is_resource($file)) {
                 fclose($file);
             }
         }
 
-    }
-
-    public function __construct(ProductsupXMLConverter $converter, DownloaderRegistry $downloaderRegistry)
-    {
-        $this->converter = $converter;
-        $this->downloaderRegistry = $downloaderRegistry;
+        return $spreadsheetInfo;
     }
 
     /**
      * @return resource
      */
-    private function downloadFile(string $uri, array $context)
+    private function downloadFile(string $uri, Context $context)
     {
         $downloaders = $this->getDownloaders($uri);
 
@@ -48,7 +70,6 @@ class ConvertHandler
                 $file = $downloader->getFileByURI($uri, $context);
             } catch (\Exception $e) {
                 // TODO: Log it
-                var_dump($e->getMessage());
                 continue;
             }
 
@@ -68,5 +89,15 @@ class ConvertHandler
         $schema = parse_url($uri, PHP_URL_SCHEME);
 
         return $this->downloaderRegistry->getSupportedDownloaders($schema);
+    }
+
+    private function getParser(Context $context): ParserInterface
+    {
+        $parserName = $context->getParserName();
+        try {
+            return $this->container->get('parser.' . $parserName);
+        } catch (NotFoundExceptionInterface $e) {
+            throw new ParserNotFound(sprintf('Parser with name "%s" cannot be found', $parserName), 0, $e);
+        }
     }
 }

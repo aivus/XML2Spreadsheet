@@ -3,16 +3,19 @@
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-use aivus\XML2Spreadsheet\Command\ConvertXMLToSpreadsheetCommand;
+use aivus\XML2Spreadsheet\Command\{AuthorizeCommand, ConvertToSpreadsheetCommand};
 use Symfony\Component\Console\Application;
 
 $containerBuilder = new DI\ContainerBuilder();
 $containerBuilder->addDefinitions('config/di.php');
 $container = $containerBuilder->build();
 
-$command = $container->get(ConvertXMLToSpreadsheetCommand::class);
-
 $application = new Application();
-$application->add($command);
+
+$convertCommand = $container->get(ConvertToSpreadsheetCommand::class);
+$application->add($convertCommand);
+
+$authorizeCommand = $container->get(AuthorizeCommand::class);
+$application->add($authorizeCommand);
 
 $application->run();
