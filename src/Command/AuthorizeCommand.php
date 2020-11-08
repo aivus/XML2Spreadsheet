@@ -3,6 +3,7 @@
 namespace aivus\XML2Spreadsheet\Command;
 
 use aivus\XML2Spreadsheet\Google\Client;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,11 +14,13 @@ class AuthorizeCommand extends Command
     protected static $defaultName = 'app:authorize';
 
     private Client $googleClient;
+    private LoggerInterface $logger;
 
-    public function __construct(Client $googleClient)
+    public function __construct(Client $googleClient, LoggerInterface $logger)
     {
         parent::__construct();
         $this->googleClient = $googleClient;
+        $this->logger = $logger;
     }
 
     protected function configure()
@@ -28,6 +31,7 @@ class AuthorizeCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->logger->info('Requesting auth URL from the Google');
         $authUrl = $this->googleClient->getAuthUrl();
 
         $io = new SymfonyStyle($input, $output);
@@ -37,15 +41,17 @@ class AuthorizeCommand extends Command
         $io->text($authUrl);
 
         $authCode = $io->ask('Enter verification code');
+        $this->logger->debug('User entered verification code. Going to exchange it on access token');
         try {
             $this->googleClient->setAccessTokenByAuthCode($authCode);
         } catch (\Exception $e) {
-            // TODO: Add logging
+            $this->logger->error('Can not set access token by auth code', ['exception' => $e]);
             $io->error($e->getMessage());
 
             return Command::FAILURE;
         }
 
+        $this->logger->debug('Auth code successfully exchanged for access token');
         $accessTokenHolder = $this->googleClient->getAccessTokenHolder();
 
         $io->title('We\'ve successfully received access token from Google.');

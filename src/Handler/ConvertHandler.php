@@ -12,6 +12,7 @@ use aivus\XML2Spreadsheet\Exception\SupportedDownloaderNotFound;
 use aivus\XML2Spreadsheet\Parser\ParserInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Facade for all convertion logic
@@ -21,20 +22,27 @@ class ConvertHandler
     private ConverterFactory $converterFactory;
     private DownloaderRegistry $downloaderRegistry;
     private ContainerInterface $container;
+    private LoggerInterface $logger;
 
     public function __construct(
         ConverterFactory $converterFactory,
         DownloaderRegistry $downloaderRegistry,
-        ContainerInterface $container
+        ContainerInterface $container,
+        LoggerInterface $logger
     ) {
         $this->converterFactory = $converterFactory;
         $this->downloaderRegistry = $downloaderRegistry;
         $this->container = $container;
+        $this->logger = $logger;
     }
 
     public function convert(string $uri, Context $context)
     {
         $file = $this->downloadFile($uri, $context);
+
+        if (!is_resource($file)) {
+            throw new \RuntimeException('Downloaded file is not a valid resource');
+        }
 
         $parser = $this->getParser($context);
         $converter = $this->converterFactory->create();
@@ -42,9 +50,6 @@ class ConvertHandler
 
         try {
             $spreadsheetInfo = $converter->convert($file, $context);
-        } catch (\Exception $e) {
-            // TODO: Add logging
-            throw $e;
         } finally {
             if (is_resource($file)) {
                 fclose($file);
@@ -65,18 +70,31 @@ class ConvertHandler
             throw new SupportedDownloaderNotFound('Can not find supported downloader for specified URI');
         }
 
+        $this->logger->info('Starting download file {file}', ['file' => $uri]);
+
         foreach ($downloaders as $downloader) {
+            $this->logger->debug(
+                'Trying to download using {downloadClass}',
+                ['downloadClass' => get_class($downloader)]
+            );
             try {
                 $file = $downloader->getFileByURI($uri, $context);
             } catch (\Exception $e) {
-                // TODO: Log it
+                $this->logger->error(
+                    'Downloading failed. Continue to the next available downloader',
+                    ['exception' => $e]
+                );
                 continue;
             }
 
             if ($file) {
+                $this->logger->info('File {file} successfully downloaded', ['file' => $uri]);
+
                 return $file;
             }
         }
+
+        $this->logger->error('Can not download file {file}', ['file' => $uri]);
 
         throw new DownloadSourceFileException('Can not receive source file');
     }
@@ -94,6 +112,8 @@ class ConvertHandler
     private function getParser(Context $context): ParserInterface
     {
         $parserName = $context->getParserName();
+        $this->logger->debug('Getting parser with name "{parserName}" from the container', ['parserName' => $parserName]);
+
         try {
             return $this->container->get('parser.' . $parserName);
         } catch (NotFoundExceptionInterface $e) {

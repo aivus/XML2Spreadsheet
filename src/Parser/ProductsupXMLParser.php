@@ -17,6 +17,11 @@ class ProductsupXMLParser implements ParserInterface
     {
         rewind($file);
         $content = stream_get_contents($file);
+
+        if ($content === false) {
+            throw new \InvalidArgumentException('Can not read content of the file');
+        }
+
         $catalog = new \SimpleXMLElement($content, LIBXML_NOCDATA);
         unset($content);
 

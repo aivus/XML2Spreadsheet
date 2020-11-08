@@ -5,6 +5,7 @@ namespace aivus\XML2Spreadsheet\Downloader;
 use aivus\XML2Spreadsheet\Context;
 use aivus\XML2Spreadsheet\Exception\DownloadSourceFileException;
 use FtpClient\FtpClient;
+use Psr\Log\LoggerInterface;
 
 /**
  * Downloader for FTP files
@@ -12,6 +13,13 @@ use FtpClient\FtpClient;
  */
 class FTPDownloader implements DownloaderInterface
 {
+    private LoggerInterface $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function getFileByURI(string $uri, Context $context)
     {
         $uriComponents = parse_url($uri);
@@ -33,11 +41,16 @@ class FTPDownloader implements DownloaderInterface
             );
         }
 
+        $this->logger->debug('Downloading file {path} from {host}',
+            ['path' => $uriComponents['path'], 'host' => $uriComponents['host']]
+        );
+
         $file = tmpfile();
         $result = $ftp->fget($file, $uriComponents['path']);
         $ftp->close();
 
         if (!$result) {
+            $this->logFailedDownload();
             fclose($file);
 
             return false;
@@ -49,5 +62,15 @@ class FTPDownloader implements DownloaderInterface
     public function isSchemaSupported($schema): bool
     {
         return strtolower($schema) === 'ftp';
+    }
+
+    private function logFailedDownload()
+    {
+        $lastError = error_get_last();
+        if ($lastError) {
+            $this->logger->warning('Downloading failed. Error: "{message}"',
+                ['lastError' => $lastError, 'message' => $lastError['message']]
+            );
+        }
     }
 }

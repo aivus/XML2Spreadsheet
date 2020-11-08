@@ -6,6 +6,7 @@ use aivus\XML2Spreadsheet\Converter\SpreadsheetData;
 use aivus\XML2Spreadsheet\Converter\SpreadsheetDocumentInfo;
 use aivus\XML2Spreadsheet\Exception\InvalidConfigurationException;
 use aivus\XML2Spreadsheet\Google\DTO\AccessTokenHolder;
+use Psr\Log\LoggerInterface;
 
 class Client
 {
@@ -23,10 +24,12 @@ class Client
     private ?\Google\Client $nativeClient = null;
 
     private Spreadsheet $spreadsheet;
+    private LoggerInterface $logger;
 
-    public function __construct(Spreadsheet $spreadsheet)
+    public function __construct(Spreadsheet $spreadsheet, LoggerInterface $logger)
     {
         $this->spreadsheet = $spreadsheet;
+        $this->logger = $logger;
     }
 
     /**
@@ -47,7 +50,7 @@ class Client
         $client = $this->getNativeClient();
         $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
         if (array_key_exists('error', $accessToken)) {
-            // TODO: Add logging
+            $this->logger->error('Can not fetch access token with auth code', ['errors' => $accessToken['error']]);
             throw new \InvalidArgumentException('Can not retrieve access token based on provided verification code');
         }
 
@@ -65,12 +68,19 @@ class Client
     public function createSpreadsheet(SpreadsheetData $spreadsheetData): SpreadsheetDocumentInfo
     {
         $client = $this->getNativeClient();
+        $this->logger->debug('Creating spreadsheet document using API');
         $spreadsheetDocument = $this->spreadsheet->createDocument($client);
 
         $values = $spreadsheetData->getRows();
         // Push header row (column names) on the first place
         array_unshift($values, $spreadsheetData->getHeaderNames());
+        $this->logger->debug('Populating spreadsheet document using API with specified data');
         $this->spreadsheet->updateDocument($client, $spreadsheetDocument, $values);
+
+        $this->logger->debug('Spreadsheet document {spreadsheetId} was successfully created and updated', [
+            'spreadsheetId' => $spreadsheetDocument->getSpreadsheetId(),
+            'spreadsheetUrl' => $spreadsheetDocument->getSpreadsheetUrl()
+        ]);
 
         return new SpreadsheetDocumentInfo(
             $spreadsheetDocument->getSpreadsheetId(),
