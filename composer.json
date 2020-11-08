@@ -1,6 +1,6 @@
 {
     "name": "aivus/spreadsheet-converter",
-    "description": "This application provides a way to convert a file to Google Spreadsheet document",
+    "description": "This application provides a way to convert an xml file to Google Spreadsheet document",
     "type": "project",
     "license": "MIT",
     "authors": [
@@ -15,6 +15,9 @@
         }
     },
     "require": {
-        "symfony/console": "^5.1"
+        "symfony/console": "^5.1",
+        "php-di/php-di": "^6.3",
+        "guzzlehttp/guzzle": "^7.0",
+        "nicolab/php-ftp-client": "^1.5"
     }
 }
