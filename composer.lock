@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d05f72171133313f8370df1daaac6f24",
+    "content-hash": "350ff208c9da547c60cfd199bd7cc26b",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -225,6 +225,55 @@
                 "url"
             ],
             "time": "2020-09-30T07:37:11+00:00"
+        },
+        {
+            "name": "nicolab/php-ftp-client",
+            "version": "v1.5.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Nicolab/php-ftp-client.git",
+                "reference": "572102d7e2c5a2a229c9875a41db073b08624b4e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Nicolab/php-ftp-client/zipball/572102d7e2c5a2a229c9875a41db073b08624b4e",
+                "reference": "572102d7e2c5a2a229c9875a41db073b08624b4e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ftp": "*",
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "FtpClient": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Tallefourtane",
+                    "email": "dev@nicolab.net",
+                    "homepage": "http://nicolab.net"
+                }
+            ],
+            "description": "A flexible FTP and SSL-FTP client for PHP. This lib provides helpers easy to use to manage the remote files.",
+            "homepage": "https://github.com/Nicolab/php-ftp-client",
+            "keywords": [
+                "file",
+                "ftp",
+                "helper",
+                "lib",
+                "server",
+                "sftp",
+                "ssl",
+                "ssl-ftp"
+            ],
+            "time": "2020-09-10T10:27:54+00:00"
         },
         {
             "name": "opis/closure",

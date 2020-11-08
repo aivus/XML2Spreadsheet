@@ -13,23 +13,29 @@ class ConvertHandler
     private ProductsupXMLConverter $converter;
     private DownloaderRegistry $downloaderRegistry;
 
+    public function convert(string $uri, array $context)
+    {
+        $file = $this->downloadFile($uri, $context);
+        try {
+            $this->converter->convert($file);
+        } finally {
+            if (is_resource($file)) {
+                fclose($file);
+            }
+        }
+
+    }
+
     public function __construct(ProductsupXMLConverter $converter, DownloaderRegistry $downloaderRegistry)
     {
         $this->converter = $converter;
         $this->downloaderRegistry = $downloaderRegistry;
     }
 
-    public function convert(string $uri)
-    {
-        $file = $this->downloadFile($uri);
-        $this->converter->convert($file);
-    }
-
     /**
-     * @param string $uri
      * @return resource
      */
-    private function downloadFile(string $uri)
+    private function downloadFile(string $uri, array $context)
     {
         $downloaders = $this->getDownloaders($uri);
 
@@ -38,7 +44,14 @@ class ConvertHandler
         }
 
         foreach ($downloaders as $downloader) {
-            $file = $downloader->getFileByURI($uri);
+            try {
+                $file = $downloader->getFileByURI($uri, $context);
+            } catch (\Exception $e) {
+                // TODO: Log it
+                var_dump($e->getMessage());
+                continue;
+            }
+
             if ($file) {
                 return $file;
             }

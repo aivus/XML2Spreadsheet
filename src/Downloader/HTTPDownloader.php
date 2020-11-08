@@ -3,7 +3,6 @@
 namespace aivus\XML2Spreadsheet\Downloader;
 
 use GuzzleHttp\Client;
-use Psr\Http\Message\ResponseInterface;
 
 class HTTPDownloader implements DownloaderInterface
 {
@@ -14,21 +13,18 @@ class HTTPDownloader implements DownloaderInterface
         $this->guzzleClient = $guzzleClient;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getFileByURI(string $uri)
+    public function getFileByURI(string $uri, array $context = [])
     {
+        $method = $context['httpMethod'] ?? 'GET';
+        // TODO: Add ability to use headers(e.g. cookies from the context)
+
         $file = tmpfile();
-        $this->guzzleClient->get($uri, ['sink' => $file]);
+        $this->guzzleClient->request($method, $uri, ['sink' => $file]);
 
         return $file;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function isSchemaSupported(string $schema): bool
+    public function isSchemaSupported($schema): bool
     {
         return in_array(strtolower($schema), ['http', 'https']);
     }

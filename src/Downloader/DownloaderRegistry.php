@@ -4,6 +4,7 @@ namespace aivus\XML2Spreadsheet\Downloader;
 
 class DownloaderRegistry
 {
+    /** @var DownloaderInterface[] */
     private array $downloaders = [];
 
     public function addDownloader(DownloaderInterface $downloader)
@@ -14,10 +15,10 @@ class DownloaderRegistry
     /**
      * Get an array of downloaders which support this schema
      *
-     * @param string $schema
+     * @param string|null $schema
      * @return DownloaderInterface[]
      */
-    public function getSupportedDownloaders(string $schema): array
+    public function getSupportedDownloaders($schema): array
     {
         $supportedDownloaders = [];
         foreach ($this->downloaders as $downloader) {
