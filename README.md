@@ -24,13 +24,16 @@ and register it using [DI configuration](config/di.php) with prefix `parser.PARS
 where `PARSER_NAME` is the value returned by `ParserInterface::getName` method.
 
 After this parser can be used like:
+
 `bin/console app:convert-to-spreadsheet -p PARSER_NAME tests/fixtures/coffee_feed.json`
 
 ### Flexible downloaders configuration
 It's possible to flexible configure downloaders by using context option from the CLI:
+
 `bin/console app:convert-to-spreadsheet -c httpMethod=POST https://example.com`
 
 Any additional headers (e.g. cookies) could be added using context (**not implemented yet**):
+
 `bin/console app:convert-to-spreadsheet -c httpHeader="Authorization: Bearer" https://example.com`
 
 `bin/console app:convert-to-spreadsheet -c httpHeader="Cookies: key1=value1; key2=value2;" https://example.com`
@@ -40,21 +43,20 @@ Google access token could be received by using command `bin/console app:authoriz
 At the end of the process this command prints a token which can be used
 in `app:convert-to-spreadsheet` command by specifying `--access-token` option.
 
-Examples:
+Example:
+
 `bin/console app:convert-to-spreadsheet --access-token=ya29.A0AfH6-some-value-printed-by-command-mShavLt2oWhve tests/fixtures/coffee_feed.xml`
 
-**Access token automatically will be requested by `app:convert-to-spreadsheet` command if you have not set `--access-token` option.**
+_Access token automatically will be requested by `app:convert-to-spreadsheet` command if you have not set `--access-token` option._
 
 ## Supported protocols
 Currently, next protocols are supported to retrieve files:
 
 ### http / https
-* To download a file using GET method (default) 
-
+* To download a file using GET method (default): 
 `bin/console app:convert-to-spreadsheet https://raw.githubusercontent.com/aivus/XML2Spreadsheet/master/tests/fixtures/coffee_feed.xml`
 
 * To download a file using any other http method (e.g. POST) pass a `context` option as a key-value `httpMethod=POST`
-
 `bin/console app:convert-to-spreadsheet -c httpMethod=POST https://raw.githubusercontent.com/aivus/XML2Spreadsheet/master/tests/fixtures/coffee_feed.xml`
 
 ### ftp
@@ -67,7 +69,8 @@ Currently, next protocols are supported to retrieve files:
 ### file / local path
 * To use a file from local filesystem:
 `bin/console app:convert-to-spreadsheet tests/fixtures/coffee_feed.xml`
-or using `file://` protocol
+
+* Or using `file://` protocol
 `bin/console app:convert-to-spreadsheet file:///home/user/app/tests/fixtures/coffee_feed.xml`
 
 ## Limitations
