@@ -7,6 +7,7 @@ use aivus\XML2Spreadsheet\Exception\InvalidAccessTokenException;
 use aivus\XML2Spreadsheet\Google\DTO\AccessTokenHolder;
 use aivus\XML2Spreadsheet\Handler\ConvertHandler;
 use aivus\XML2Spreadsheet\Parser\ProductsupXMLParser;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,11 +27,13 @@ class ConvertToSpreadsheetCommand extends Command
     protected static $defaultName = 'app:convert-to-spreadsheet';
 
     private ConvertHandler $convertHandler;
+    private LoggerInterface $logger;
 
-    public function __construct(ConvertHandler $convertHandler)
+    public function __construct(ConvertHandler $convertHandler, LoggerInterface $logger)
     {
         parent::__construct();
         $this->convertHandler = $convertHandler;
+        $this->logger = $logger;
     }
 
     protected function configure()
@@ -69,7 +72,8 @@ class ConvertToSpreadsheetCommand extends Command
 
         try {
             $spreadsheetInfo = $this->convertHandler->convert($uri, $context);
-        } catch (InvalidAccessTokenException $e) {
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage(), ['exception' => $e]);
             $io->error($e->getMessage());
 
             return Command::FAILURE;

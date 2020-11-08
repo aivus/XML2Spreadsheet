@@ -3,6 +3,7 @@
 namespace aivus\XML2Spreadsheet\Converter;
 
 use aivus\XML2Spreadsheet\Google\Client;
+use Psr\Log\LoggerInterface;
 
 /**
  * Factory for Converter class
@@ -11,14 +12,16 @@ use aivus\XML2Spreadsheet\Google\Client;
 class ConverterFactory
 {
     private Client $client;
+    private LoggerInterface $logger;
 
-    public function __construct(Client $client)
+    public function __construct(Client $client, LoggerInterface $logger)
     {
         $this->client = $client;
+        $this->logger = $logger;
     }
 
     public function create(): Converter
     {
-        return new Converter($this->client);
+        return new Converter($this->client, $this->logger);
     }
 }
