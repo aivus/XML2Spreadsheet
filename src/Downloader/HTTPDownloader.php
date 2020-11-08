@@ -2,8 +2,12 @@
 
 namespace aivus\XML2Spreadsheet\Downloader;
 
+use aivus\XML2Spreadsheet\Context;
 use GuzzleHttp\Client;
 
+/**
+ * Downloader for remote web files which can be loaded by http/https protocols
+ */
 class HTTPDownloader implements DownloaderInterface
 {
     private Client $guzzleClient;
@@ -13,9 +17,9 @@ class HTTPDownloader implements DownloaderInterface
         $this->guzzleClient = $guzzleClient;
     }
 
-    public function getFileByURI(string $uri, array $context = [])
+    public function getFileByURI(string $uri, Context $context)
     {
-        $method = $context['httpMethod'] ?? 'GET';
+        $method = $context->getOption('httpMethod', 'GET');
         // TODO: Add ability to use headers(e.g. cookies from the context)
 
         $file = tmpfile();
