@@ -73,6 +73,17 @@ Currently, next protocols are supported to retrieve files:
 * Or using `file://` protocol
 `bin/console app:convert-to-spreadsheet file:///home/user/app/tests/fixtures/coffee_feed.xml`
 
+## Docker setup
+1. Follow the steps from [Configuration](#configuration) section to retrieve Google OAuth credentials file and put it to `config/credentials.json`
+
+2. To build docker image using the provided [Dockerfile](Dockerfile) you need to run:
+
+`docker build -t xml2spreadsheet .`
+
+3. Run command to start a conversion:
+
+`docker run -it --rm xml2spreadsheet:latest app:convert-to-spreadsheet https://raw.githubusercontent.com/aivus/XML2Spreadsheet/master/tests/fixtures/coffee_feed.xml`
+
 ## Limitations
 * By default, each Google access token is expiring in 3600 seconds (1 hour). 
 Current implementation doesn't have autorefreshing of this token. It means it's required to repeat authorization flow
