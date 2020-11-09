@@ -13,5 +13,8 @@ interface ParserInterface
      */
     public function parseResource($file): SpreadsheetData;
 
+    /**
+     * Returns unique parser name which will be used to specify parser
+     */
     public static function getName(): string;
 }

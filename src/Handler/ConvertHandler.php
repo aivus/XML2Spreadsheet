@@ -36,7 +36,7 @@ class ConvertHandler
         $this->logger = $logger;
     }
 
-    public function convert(string $uri, Context $context)
+    public function process(string $uri, Context $context)
     {
         $file = $this->downloadFile($uri, $context);
 
@@ -112,12 +112,22 @@ class ConvertHandler
     private function getParser(Context $context): ParserInterface
     {
         $parserName = $context->getParserName();
-        $this->logger->debug('Getting parser with name "{parserName}" from the container', ['parserName' => $parserName]);
+        $this->logger->debug(
+            'Getting parser with name "{parserName}" from the container', ['parserName' => $parserName]
+        );
 
         try {
-            return $this->container->get('parser.' . $parserName);
+            $parser = $this->container->get('parser.' . $parserName);
         } catch (NotFoundExceptionInterface $e) {
             throw new ParserNotFound(sprintf('Parser with name "%s" cannot be found', $parserName), 0, $e);
         }
+
+        if (!$parser instanceof ParserInterface) {
+            throw new \InvalidArgumentException(
+                sprintf('Parser "%s" must implement "%s"', get_class($parser), ParserInterface::class)
+            );
+        }
+
+        return $parser;
     }
 }

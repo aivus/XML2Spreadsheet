@@ -71,7 +71,7 @@ class ConvertToSpreadsheetCommand extends Command
         }
 
         try {
-            $spreadsheetInfo = $this->convertHandler->convert($uri, $context);
+            $spreadsheetInfo = $this->convertHandler->process($uri, $context);
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage(), ['exception' => $e]);
             $io->error($e->getMessage());
