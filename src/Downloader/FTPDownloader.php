@@ -45,6 +45,9 @@ class FTPDownloader implements DownloaderInterface
             ['path' => $uriComponents['path'], 'host' => $uriComponents['host']]
         );
 
+        // Enable passive mode by default
+        $ftp->pasv(true);
+
         $file = tmpfile();
         $result = $ftp->fget($file, $uriComponents['path']);
         $ftp->close();
