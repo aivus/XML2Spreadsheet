@@ -7,8 +7,8 @@ use aivus\XML2Spreadsheet\Converter\ConverterFactory;
 use aivus\XML2Spreadsheet\Downloader\DownloaderInterface;
 use aivus\XML2Spreadsheet\Downloader\DownloaderRegistry;
 use aivus\XML2Spreadsheet\Exception\DownloadSourceFileException;
-use aivus\XML2Spreadsheet\Exception\ParserNotFound;
-use aivus\XML2Spreadsheet\Exception\SupportedDownloaderNotFound;
+use aivus\XML2Spreadsheet\Exception\ParserNotFoundException;
+use aivus\XML2Spreadsheet\Exception\SupportedDownloaderNotFoundException;
 use aivus\XML2Spreadsheet\Parser\ParserInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -67,7 +67,7 @@ class ConvertHandler
         $downloaders = $this->getDownloaders($uri);
 
         if (!$downloaders) {
-            throw new SupportedDownloaderNotFound('Can not find supported downloader for specified URI');
+            throw new SupportedDownloaderNotFoundException('Can not find supported downloader for specified URI');
         }
 
         $this->logger->info('Starting download file {file}', ['file' => $uri]);
@@ -119,7 +119,7 @@ class ConvertHandler
         try {
             $parser = $this->container->get('parser.' . $parserName);
         } catch (NotFoundExceptionInterface $e) {
-            throw new ParserNotFound(sprintf('Parser with name "%s" cannot be found', $parserName), 0, $e);
+            throw new ParserNotFoundException(sprintf('Parser with name "%s" cannot be found', $parserName), 0, $e);
         }
 
         if (!$parser instanceof ParserInterface) {
